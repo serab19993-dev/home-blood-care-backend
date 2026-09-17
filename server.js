@@ -88,13 +88,15 @@ return Response.json({
 });
 
 } catch (error) {
-return Response.json(
-  {
-    success: false,
-    error: error.message
-  },
-  { status: 500 }
-);
+  console.error("SEND_NOTIFICATION_ERROR:", error);
+
+  return Response.json(
+    {
+      success: false,
+      error: error.message
+    },
+    { status: 500 }
+  );
 }
 }
 };
