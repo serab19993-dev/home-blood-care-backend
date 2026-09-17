@@ -1,58 +1,34 @@
-const express = require("express");
-const admin = require("firebase-admin");
-
-const app = express();
-app.use(express.json());
-
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
-const db = admin.firestore();
-
-app.get("/", (req, res) => {
-  res.send("Home Blood Care backend is running");
-});
-
-app.post("/send-order-notification", async (req, res) => {
-  try {
-    const { orderId } = req.body;
-
-    if (!orderId) {
-      return res.status(400).json({ error: "orderId is required" });
+export default {
+  async fetch(request, env) {
+    if (request.method === "GET") {
+      return new Response("Home Blood Care backend is running");
     }
 
-    const settingsDoc = await db.collection("settings").doc("app").get();
-    const managerFcmToken = settingsDoc.data()?.managerFcmToken;
-
-    if (!managerFcmToken) {
-      return res.status(400).json({ error: "Manager FCM token not found" });
+    if (request.method !== "POST") {
+      return new Response("Method Not Allowed", { status: 405 });
     }
 
-    const message = {
-      token: managerFcmToken,
-      notification: {
-        title: "طلب جديد",
-        body: `تم استلام طلب جديد رقم ${orderId}`
-      },
-      data: {
-        orderId: String(orderId)
+    if (new URL(request.url).pathname !== "/send-order-notification") {
+      return new Response("Not Found", { status: 404 });
+    }
+
+    try {
+      const body = await request.json();
+      const orderId = body.orderId;
+
+      if (!orderId) {
+        return Response.json(
+          { error: "orderId is required" },
+          { status: 400 }
+        );
       }
-    };
 
-    await admin.messaging().send(message);
+      const serviceAccount = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT);
 
-    res.json({ success: true });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
-  }
-});
+      const accessToken = await getAccessToken(serviceAccount);
 
-const PORT = process.env.PORT || 10000;
+      const settingsUrl =
+        `https://firestore.googleapis.com/v1/projects/home-blood-care/databases/(default)/documents/settings/app`;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+      const settingsResponse = await fetch(settingsUrl, {
+        headers
