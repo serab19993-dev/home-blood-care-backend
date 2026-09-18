@@ -4,5 +4,12 @@
   "main": "server.js",
   "compatibility_date": "2026-09-17",
   "workers_dev": true,
-  "keep_vars": true
+  "keep_vars": true,
+
+  "kv_namespaces": [
+    {
+      "binding": "HOME_BLOOD_IMAGES",
+      "id": "9454c6b76b0444009e40a16941a76d4b"
+    }
+  ]
 }
