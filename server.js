@@ -72,7 +72,7 @@ const fcmResponse = await fetch(
         token: managerFcmToken,
         notification: {
           title: "طلب جديد",
-          body: `تم استلام طلب جديد رقم ${orderId}`
+          body: "تم استلام طلب جديد يحتاج الى مراجعة "
         },
         data: {
           orderId: String(orderId)
