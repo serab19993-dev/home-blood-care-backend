@@ -4,4 +4,5 @@
   "main": "server.js",
   "compatibility_date": "2026-09-17",
   "workers_dev": true,
+  "keep_vars": true
 }
