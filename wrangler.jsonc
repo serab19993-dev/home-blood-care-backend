@@ -4,10 +4,5 @@
   "main": "server.js",
   "compatibility_date": "2026-09-17",
   "workers_dev": true,
-  "keep_vars": true,
-  "secrets": {
-    "required": [
-      "FIREBASE_SERVICE_ACCOUNT"
-    ]
-  }
+  "keep_vars": true
 }
