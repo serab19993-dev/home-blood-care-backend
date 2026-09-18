@@ -1,5 +1,11 @@
 export default {
   async fetch(request, env) {
+    
+    if (request.method === "GET" && new URL(request.url).pathname === "/check-secret") {
+  return new Response(
+    env.FIREBASE_SERVICE_ACCOUNT ? "SECRET_OK" : "SECRET_MISSING"
+  );
+}
     if (request.method === "GET") {
       return new Response("Home Blood Care backend is running");
     }
