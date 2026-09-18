@@ -6,6 +6,32 @@ export default {
     env.FIREBASE_SERVICE_ACCOUNT ? "SECRET_OK" : "SECRET_MISSING"
   );
 }
+    if (
+  request.method === "GET" &&
+  new URL(request.url).pathname.startsWith("/order-image/")
+) {
+  const orderId = new URL(request.url).pathname.split("/").pop();
+
+  if (!orderId) {
+    return new Response("Order ID is required", { status: 400 });
+  }
+
+  const image = await env.HOME_BLOOD_IMAGES.get(
+    `order-image-${orderId}`,
+    { type: "arrayBuffer" }
+  );
+
+  if (!image) {
+    return new Response("Image not found", { status: 404 });
+  }
+
+  return new Response(image, {
+    headers: {
+      "Content-Type": "image/jpeg",
+      "Cache-Control": "public, max-age=31536000"
+    }
+  });
+}
     if (request.method === "GET") {
       return new Response("Home Blood Care backend is running");
     }
