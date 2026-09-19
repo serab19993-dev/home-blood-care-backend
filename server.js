@@ -32,6 +32,60 @@ export default {
     }
   });
 }
+    if (
+  request.method === "POST" &&
+  new URL(request.url).pathname === "/upload-order-image"
+) {
+  try {
+    const url = new URL(request.url);
+    const orderId = url.searchParams.get("orderId");
+
+    if (!orderId) {
+      return new Response("Order ID is required", { status: 400 });
+    }
+
+    const contentType =
+      request.headers.get("content-type") || "image/jpeg";
+
+    if (!contentType.startsWith("image/")) {
+      return new Response("Only image files are allowed", {
+        status: 400
+      });
+    }
+
+    const imageData = await request.arrayBuffer();
+
+    if (imageData.byteLength > 10 * 1024 * 1024) {
+      return new Response("Image is too large", {
+        status: 413
+      });
+    }
+
+    await env.HOME_BLOOD_IMAGES.put(
+      `order-image-${orderId}`,
+      imageData
+    );
+
+    const imageUrl =
+      `${url.origin}/order-image/${orderId}`;
+
+    return Response.json({
+      success: true,
+      imageUrl: imageUrl
+    });
+
+  } catch (error) {
+    console.error("UPLOAD_IMAGE_ERROR:", error);
+
+    return Response.json(
+      {
+        success: false,
+        error: error.message
+      },
+      { status: 500 }
+    );
+  }
+}
     if (request.method === "GET") {
       return new Response("Home Blood Care backend is running");
     }
